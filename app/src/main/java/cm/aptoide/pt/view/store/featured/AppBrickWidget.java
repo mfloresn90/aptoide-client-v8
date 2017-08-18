@@ -34,20 +34,16 @@ public class AppBrickWidget extends Widget<AppBrickDisplayable> {
   @Override public void bindView(AppBrickDisplayable displayable) {
     final FragmentActivity context = getContext();
     ImageLoader.with(context)
-        .load(displayable.getPojo()
-            .getGraphic(), R.drawable.placeholder_brick, graphic);
+        .load(displayable.getPojo().getGraphic(), R.drawable.placeholder_brick, graphic);
 
-    compositeSubscription.add(RxView.clicks(itemView)
-        .subscribe(v -> {
-          Analytics.AppViewViewedFrom.addStepToList(displayable.getTag());
-          getFragmentNavigator().navigateTo(V8Engine.getFragmentProvider()
-              .newAppViewFragment(displayable.getPojo()
-                  .getId(), displayable.getPojo()
-                  .getPackageName()));
-          Analytics.HomePageEditorsChoice.clickOnEditorsChoiceItem(getAdapterPosition(),
-              displayable.getPojo()
-                  .getPackageName(), true);
-        }, throwable -> CrashReport.getInstance()
-            .log(throwable)));
+    compositeSubscription.add(RxView.clicks(itemView).subscribe(v -> {
+      Analytics.AppViewViewedFrom.addStepToList(displayable.getTag());
+      getFragmentNavigator().navigateTo(V8Engine.getFragmentProvider()
+          .newAppViewFragment(displayable.getPojo().getId(), displayable.getPojo().getPackageName(),
+              displayable.getPojo().getStore().getAppearance().getTheme(),
+              displayable.getPojo().getStore().getName()));
+      Analytics.HomePageEditorsChoice.clickOnEditorsChoiceItem(getAdapterPosition(),
+          displayable.getPojo().getPackageName(), true);
+    }, throwable -> CrashReport.getInstance().log(throwable)));
   }
 }

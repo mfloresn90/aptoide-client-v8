@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.AttributeSet;
+import android.view.View;
 import android.widget.ImageView;
 import cm.aptoide.pt.R;
 import cm.aptoide.pt.V8Engine;
@@ -16,6 +18,7 @@ import cm.aptoide.pt.preferences.Application;
 import cm.aptoide.pt.remotebootconfig.BootConfigJSONUtils;
 import cm.aptoide.pt.remotebootconfig.BootConfigServices;
 import cm.aptoide.pt.remotebootconfig.datamodel.RemoteBootConfig;
+import cm.aptoide.pt.store.StoreTheme;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -50,6 +53,19 @@ public class PartnersLaunchView extends ActivityView {
    */
   @Override public void onBackPressed() {
     //nothing
+  }
+
+  /**
+   * setup partner theme
+   */
+  @Override public View onCreateView(View parent, String name, Context context,
+      AttributeSet attrs) {
+    String storeTheme = V8Engine.getConfiguration().getDefaultTheme();
+    if (storeTheme != null) {
+      ThemeUtils.setStoreTheme(this, storeTheme);
+      ThemeUtils.setStatusBarThemeColor(this, StoreTheme.get(storeTheme));
+    }
+    return super.onCreateView(parent, name, context, attrs);
   }
 
   /**
@@ -104,7 +120,7 @@ public class PartnersLaunchView extends ActivityView {
         if (response.body() != null) {
           BootConfigJSONUtils.saveRemoteBootConfig(context, response.body());
           ((VanillaConfiguration) Application.getConfiguration()).setBootConfig(
-              BootConfigJSONUtils.getSavedRemoteBootConfig(context).getData());
+              response.body().getData());
         }
         handleSplashScreenTimer();
       }

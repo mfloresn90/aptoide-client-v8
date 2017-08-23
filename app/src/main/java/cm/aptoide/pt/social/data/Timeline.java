@@ -156,8 +156,11 @@ public class Timeline {
         });
   }
 
-  public void clearLoading() {
-    timelinePostsRepository.clearLoading();
+  public Completable setPostRead(String markAsReadUrl, String cardId, CardType cardType) {
+    if (markAsReadUrl != null && !markAsReadUrl.isEmpty()) {
+      return service.setPostRead(markAsReadUrl, cardId, cardType.name());
+    }
+    return Completable.complete();
   }
 }
 

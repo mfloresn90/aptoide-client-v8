@@ -5,11 +5,9 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.AttributeSet;
-import android.view.View;
 import android.widget.ImageView;
+import cm.aptoide.pt.AptoideApplication;
 import cm.aptoide.pt.R;
-import cm.aptoide.pt.V8Engine;
 import cm.aptoide.pt.VanillaConfiguration;
 import cm.aptoide.pt.dataprovider.BuildConfig;
 import cm.aptoide.pt.logger.Logger;
@@ -18,7 +16,6 @@ import cm.aptoide.pt.preferences.Application;
 import cm.aptoide.pt.remotebootconfig.BootConfigJSONUtils;
 import cm.aptoide.pt.remotebootconfig.BootConfigServices;
 import cm.aptoide.pt.remotebootconfig.datamodel.RemoteBootConfig;
-import cm.aptoide.pt.store.StoreTheme;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -107,7 +104,7 @@ public class PartnersLaunchView extends ActivityView {
         + BuildConfig.APTOIDE_WEB_SERVICES_V7_HOST
         + "/api/7/client/boot/")
         .addConverterFactory(GsonConverterFactory.create())
-        .client(((V8Engine) context.getApplicationContext()).getDefaultClient())
+        .client(((AptoideApplication) context.getApplicationContext()).getDefaultClient())
         .build();
     Call<RemoteBootConfig> call = retrofit.create(BootConfigServices.class)
         .getRemoteBootConfig(Application.getConfiguration().getAppId(),
@@ -120,7 +117,7 @@ public class PartnersLaunchView extends ActivityView {
         if (response.body() != null) {
           BootConfigJSONUtils.saveRemoteBootConfig(context, response.body());
           ((VanillaConfiguration) Application.getConfiguration()).setBootConfig(
-              response.body().getData());
+              BootConfigJSONUtils.getSavedRemoteBootConfig(context).getData());
         }
         handleSplashScreenTimer();
       }

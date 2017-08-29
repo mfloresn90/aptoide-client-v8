@@ -13,7 +13,6 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.annotation.CallSuper;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -29,11 +28,10 @@ import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.TextView;
+import cm.aptoide.pt.AptoideApplication;
 import cm.aptoide.pt.R;
-import cm.aptoide.pt.V8Engine;
 import cm.aptoide.pt.actions.PermissionManager;
 import cm.aptoide.pt.analytics.Analytics;
 import cm.aptoide.pt.crashreports.CrashReport;
@@ -52,13 +50,11 @@ import cm.aptoide.pt.preferences.managed.ManagedKeys;
 import cm.aptoide.pt.preferences.managed.ManagerPreferences;
 import cm.aptoide.pt.preferences.secure.SecureCoderDecoder;
 import cm.aptoide.pt.repository.RepositoryFactory;
-import cm.aptoide.pt.store.StoreTheme;
 import cm.aptoide.pt.updates.UpdateRepository;
 import cm.aptoide.pt.util.SettingsConstants;
 import cm.aptoide.pt.utils.AptoideUtils;
 import cm.aptoide.pt.utils.GenericDialogs;
 import cm.aptoide.pt.utils.design.ShowMessage;
-import cm.aptoide.pt.view.ThemeUtils;
 import cm.aptoide.pt.view.dialog.EditableTextDialog;
 import cm.aptoide.pt.view.rx.RxAlertDialog;
 import cm.aptoide.pt.view.rx.RxPreference;
@@ -112,8 +108,8 @@ public class SettingsFragment extends PreferenceFragmentCompat
     super.onCreate(savedInstanceState);
     trackAnalytics = true;
     sharedPreferences =
-        ((V8Engine) getContext().getApplicationContext()).getDefaultSharedPreferences();
-    fileManager = ((V8Engine) getContext().getApplicationContext()).getFileManager();
+        ((AptoideApplication) getContext().getApplicationContext()).getDefaultSharedPreferences();
+    fileManager = ((AptoideApplication) getContext().getApplicationContext()).getFileManager();
     subscriptions = new CompositeSubscription();
     permissionManager = new PermissionManager();
     adultContentConfirmationDialog =
@@ -141,9 +137,10 @@ public class SettingsFragment extends PreferenceFragmentCompat
         .setEditText(R.id.pininput)
         .build();
 
-    notificationCenter = ((V8Engine) getContext().getApplicationContext()).getNotificationCenter();
+    notificationCenter =
+        ((AptoideApplication) getContext().getApplicationContext()).getNotificationCenter();
     notificationSyncScheduler =
-        ((V8Engine) getContext().getApplicationContext()).getNotificationSyncScheduler();
+        ((AptoideApplication) getContext().getApplicationContext()).getNotificationSyncScheduler();
   }
 
   @Override public void onCreatePreferences(Bundle bundle, String s) {
@@ -151,10 +148,10 @@ public class SettingsFragment extends PreferenceFragmentCompat
     SharedPreferences sharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(getActivity());
     sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-    adultContent =
-        new AdultContent(((V8Engine) getContext().getApplicationContext()).getAccountManager(),
-            new Preferences(sharedPreferences), new SecurePreferences(sharedPreferences,
-            new SecureCoderDecoder.Builder(getContext(), sharedPreferences).create()));
+    adultContent = new AdultContent(
+        ((AptoideApplication) getContext().getApplicationContext()).getAccountManager(),
+        new Preferences(sharedPreferences), new SecurePreferences(sharedPreferences,
+        new SecureCoderDecoder.Builder(getContext(), sharedPreferences).create()));
   }
 
   @CallSuper @Nullable @Override
@@ -207,16 +204,16 @@ public class SettingsFragment extends PreferenceFragmentCompat
   @Override public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
     if (shouldRefreshUpdates(key)) {
       UpdateAccessor updateAccessor = AccessorFactory.getAccessorFor(
-          ((V8Engine) getContext().getApplicationContext().getApplicationContext()).getDatabase(),
-          Update.class);
+          ((AptoideApplication) getContext().getApplicationContext()).getDatabase(), Update.class);
       updateAccessor.removeAll();
-      UpdateRepository repository = RepositoryFactory.getUpdateRepository(context,
-          ((V8Engine) context.getApplicationContext()).getDefaultSharedPreferences());
+      UpdateRepository repository = RepositoryFactory.getUpdateRepository(getContext(),
+          ((AptoideApplication) getContext().getApplicationContext()).getDefaultSharedPreferences());
       repository.sync(true)
           .andThen(repository.getAll(false))
           .first()
           .subscribe(updates -> Logger.d(TAG, "updates refreshed"), throwable -> {
-            CrashReport.getInstance().log(throwable);
+            CrashReport.getInstance()
+                .log(throwable);
           });
     }
   }
@@ -230,15 +227,18 @@ public class SettingsFragment extends PreferenceFragmentCompat
     //set AppStore name
     findPreference(SettingsConstants.CHECK_AUTO_UPDATE_CATEGORY).setTitle(
         AptoideUtils.StringU.getFormattedString(R.string.setting_category_autoupdate,
-            getContext().getResources(), Application.getConfiguration().getMarketName()));
+            getContext().getResources(), Application.getConfiguration()
+                .getMarketName()));
 
     Preference autoUpdatepreference = findPreference(SettingsConstants.CHECK_AUTO_UPDATE);
     autoUpdatepreference.setTitle(
         AptoideUtils.StringU.getFormattedString(R.string.setting_category_autoupdate_title,
-            getContext().getResources(), Application.getConfiguration().getMarketName()));
+            getContext().getResources(), Application.getConfiguration()
+                .getMarketName()));
     autoUpdatepreference.setSummary(
         AptoideUtils.StringU.getFormattedString(R.string.setting_category_autoupdate_message,
-            getContext().getResources(), Application.getConfiguration().getMarketName()));
+            getContext().getResources(), Application.getConfiguration()
+                .getMarketName()));
 
     subscriptions.add(RxPreference.checks(socialCampaignNotifications)
         .subscribe(isChecked -> handleSocialNotifications(isChecked)));
@@ -259,35 +259,41 @@ public class SettingsFragment extends PreferenceFragmentCompat
         .retry()
         .subscribe());
 
-    subscriptions.add(RxPreference.checks(adultContentPreferenceView).flatMap(checked -> {
-      rollbackCheck(adultContentPreferenceView);
-      if (checked) {
-        adultContentConfirmationDialog.show();
-        return Observable.empty();
-      } else {
-        adultContentPreferenceView.setEnabled(false);
-        return adultContent.disable()
-            .doOnCompleted(() -> trackLock())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnTerminate(() -> adultContentPreferenceView.setEnabled(true))
-            .toObservable();
-      }
-    }).retry().subscribe());
+    subscriptions.add(RxPreference.checks(adultContentPreferenceView)
+        .flatMap(checked -> {
+          rollbackCheck(adultContentPreferenceView);
+          if (checked) {
+            adultContentConfirmationDialog.show();
+            return Observable.empty();
+          } else {
+            adultContentPreferenceView.setEnabled(false);
+            return adultContent.disable()
+                .doOnCompleted(() -> trackLock())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnTerminate(() -> adultContentPreferenceView.setEnabled(true))
+                .toObservable();
+          }
+        })
+        .retry()
+        .subscribe());
 
-    subscriptions.add(RxPreference.checks(adultContentWithPinPreferenceView).flatMap(checked -> {
-      rollbackCheck(adultContentWithPinPreferenceView);
-      if (checked) {
-        enableAdultContentPinDialog.show();
-        return Observable.empty();
-      } else {
-        adultContentWithPinPreferenceView.setEnabled(false);
-        return adultContent.disable()
-            .doOnCompleted(() -> trackLock())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnTerminate(() -> adultContentWithPinPreferenceView.setEnabled(true))
-            .toObservable();
-      }
-    }).retry().subscribe());
+    subscriptions.add(RxPreference.checks(adultContentWithPinPreferenceView)
+        .flatMap(checked -> {
+          rollbackCheck(adultContentWithPinPreferenceView);
+          if (checked) {
+            enableAdultContentPinDialog.show();
+            return Observable.empty();
+          } else {
+            adultContentWithPinPreferenceView.setEnabled(false);
+            return adultContent.disable()
+                .doOnCompleted(() -> trackLock())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnTerminate(() -> adultContentWithPinPreferenceView.setEnabled(true))
+                .toObservable();
+          }
+        })
+        .retry()
+        .subscribe());
 
     subscriptions.add(adultContent.pinRequired()
         .observeOn(AndroidSchedulers.mainThread())
@@ -306,17 +312,22 @@ public class SettingsFragment extends PreferenceFragmentCompat
         })
         .subscribe());
 
-    subscriptions.add(RxPreference.clicks(pinPreferenceView).doOnNext(preference -> {
-      setPinDialog.show();
-    }).subscribe());
+    subscriptions.add(RxPreference.clicks(pinPreferenceView)
+        .doOnNext(preference -> {
+          setPinDialog.show();
+        })
+        .subscribe());
 
-    subscriptions.add(RxPreference.clicks(removePinPreferenceView).doOnNext(preference -> {
-      removePinDialog.show();
-    }).subscribe());
+    subscriptions.add(RxPreference.clicks(removePinPreferenceView)
+        .doOnNext(preference -> {
+          removePinDialog.show();
+        })
+        .subscribe());
 
     subscriptions.add(setPinDialog.positiveClicks()
         .filter(pin -> !TextUtils.isEmpty(pin))
-        .flatMap(pin -> adultContent.requirePin(Integer.valueOf(pin.toString())).toObservable())
+        .flatMap(pin -> adultContent.requirePin(Integer.valueOf(pin.toString()))
+            .toObservable())
         .retry()
         .subscribe());
 
@@ -452,7 +463,8 @@ public class SettingsFragment extends PreferenceFragmentCompat
     about.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
       @Override public boolean onPreferenceClick(Preference preference) {
 
-        View view = LayoutInflater.from(context).inflate(R.layout.dialog_about, null);
+        View view = LayoutInflater.from(context)
+            .inflate(R.layout.dialog_about, null);
         String versionName = "";
         int versionCode = 0;
 
@@ -460,13 +472,15 @@ public class SettingsFragment extends PreferenceFragmentCompat
           versionName = getActivity().getPackageManager()
               .getPackageInfo(getActivity().getPackageName(), 0).versionName;
         } catch (PackageManager.NameNotFoundException e) {
-          CrashReport.getInstance().log(e);
+          CrashReport.getInstance()
+              .log(e);
         }
         try {
           versionCode = getActivity().getPackageManager()
               .getPackageInfo(getActivity().getPackageName(), 0).versionCode;
         } catch (PackageManager.NameNotFoundException e) {
-          CrashReport.getInstance().log(e);
+          CrashReport.getInstance()
+              .log(e);
         }
 
         ((TextView) view.findViewById(R.id.aptoide_version)).setText(

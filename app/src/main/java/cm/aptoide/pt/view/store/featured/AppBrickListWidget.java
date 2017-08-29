@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import cm.aptoide.pt.R;
-import cm.aptoide.pt.V8Engine;
+import cm.aptoide.pt.AptoideApplication;
 import cm.aptoide.pt.analytics.Analytics;
 import cm.aptoide.pt.crashreports.CrashReport;
 import cm.aptoide.pt.dataprovider.model.v7.listapp.App;
@@ -40,16 +40,20 @@ public class AppBrickListWidget extends Widget<AppBrickListDisplayable> {
   @Override public void bindView(AppBrickListDisplayable displayable) {
     App app = displayable.getPojo();
 
-    ImageLoader.with(getContext()).load(app.getGraphic(), R.drawable.placeholder_brick, graphic);
+    ImageLoader.with(getContext())
+        .load(app.getGraphic(), R.drawable.placeholder_brick, graphic);
     name.setText(app.getName());
-    ratingBar.setRating(app.getStats().getRating().getAvg());
-    compositeSubscription.add(RxView.clicks(itemView).subscribe(v -> {
-      Analytics.AppViewViewedFrom.addStepToList(displayable.getTag());
-      getFragmentNavigator().navigateTo(V8Engine.getFragmentProvider()
-          .newAppViewFragment(app.getId(), app.getPackageName(),
-              app.getStore().getAppearance().getTheme(), app.getStore().getName()));
-      Analytics.HomePageEditorsChoice.clickOnEditorsChoiceItem(getAdapterPosition(),
-          app.getPackageName(), false);
-    }, throwable -> CrashReport.getInstance().log(throwable)));
+    ratingBar.setRating(app.getStats()
+        .getRating()
+        .getAvg());
+    compositeSubscription.add(RxView.clicks(itemView)
+        .subscribe(v -> {
+          Analytics.AppViewViewedFrom.addStepToList(displayable.getTag());
+          getFragmentNavigator().navigateTo(AptoideApplication.getFragmentProvider()
+              .newAppViewFragment(app.getId(), app.getPackageName()));
+          Analytics.HomePageEditorsChoice.clickOnEditorsChoiceItem(getAdapterPosition(),
+              app.getPackageName(), false);
+        }, throwable -> CrashReport.getInstance()
+            .log(throwable)));
   }
 }

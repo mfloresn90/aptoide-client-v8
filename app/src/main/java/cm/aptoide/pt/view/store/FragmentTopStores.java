@@ -13,7 +13,7 @@ import cm.aptoide.pt.dataprovider.model.v7.store.ListStores;
 import cm.aptoide.pt.dataprovider.model.v7.store.Store;
 import cm.aptoide.pt.dataprovider.ws.v7.Endless;
 import cm.aptoide.pt.dataprovider.ws.v7.store.ListStoresRequest;
-import cm.aptoide.pt.v8engine.store.StoreAnalytics;
+import cm.aptoide.pt.store.StoreAnalytics;
 import cm.aptoide.pt.view.fragment.AptoideBaseFragment;
 import cm.aptoide.pt.view.recycler.BaseAdapter;
 import cm.aptoide.pt.view.recycler.EndlessRecyclerOnScrollListener;
@@ -78,7 +78,7 @@ public class FragmentTopStores extends AptoideBaseFragment<BaseAdapter> implemen
 
   private void fetchStores() {
     final ListStoresRequest listStoresRequest =
-        requestFactory.newListStoresRequest(offset, STORES_LIMIT_PER_REQUEST);
+        requestFactoryCdnPool.newListStoresRequest(offset, STORES_LIMIT_PER_REQUEST);
     EndlessRecyclerOnScrollListener endlessRecyclerOnScrollListener =
         new EndlessRecyclerOnScrollListener(this.getAdapter(), listStoresRequest, listener,
             err -> err.printStackTrace());

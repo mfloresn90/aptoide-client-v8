@@ -634,6 +634,7 @@
 
 
   <string name="share">Share</string>
+  <string name="share_store">Share Store</string>
   <string name="share_on_timeline">Share on timeline</string>
 
   <!-- Search Widget-->
@@ -663,8 +664,14 @@
   <string name="generalscreen_short_root_install_success_install">App successfully installed</string>
 
   <string name="stores_message_private_user">This user is private or doesn\'t have a store.</string>
+  <string name="hello_follow_me_on_aptoide">Hello! Follow me on %s</string>
 
   <!--comments-->
+
+  <string name="comments_filter_comments_by_language">Filter comments by language</string>
+  <string name="comments_filter_comments_by_language_all">All</string>
+  <string name="comments_filter_comments_by_language_current_language_first">Current language first</string>
+  <string name="comments_filter_comments_by_language_english">English</string>
 
 </resources>
 

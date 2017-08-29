@@ -18,11 +18,10 @@ public class TimelineAdPostViewHolder extends PostViewHolder<AdPost> {
   private final PublishSubject<CardTouchEvent> cardTouchEventPublishSubject;
   private final LinearLayout cardLayout;
   private final ProgressBar adLoading;
-  private NativeAdErrorEvent nativeAdErrorEvent;
 
   public TimelineAdPostViewHolder(View view,
       PublishSubject<CardTouchEvent> cardTouchEventPublishSubject) {
-    super(view);
+    super(view, cardTouchEventPublishSubject);
     this.cardTouchEventPublishSubject = cardTouchEventPublishSubject;
     this.cardLayout = (LinearLayout) view.findViewById(R.id.card_layout);
     this.adLoading = (ProgressBar) view.findViewById(R.id.timeline_ad_loading);
@@ -30,20 +29,25 @@ public class TimelineAdPostViewHolder extends PostViewHolder<AdPost> {
 
   @Override public void setPost(AdPost post, int position) {
     this.cardLayout.setVisibility(View.VISIBLE);
+    this.cardLayout.removeAllViews();
+    this.cardLayout.addView(adLoading);
     this.adLoading.setVisibility(View.VISIBLE);
-    this.nativeAdErrorEvent = new NativeAdErrorEvent(post, CardTouchEvent.Type.ERROR, position);
     post.getAdView()
         .subscribe(adResponse -> {
           if (adResponse.getStatus()
               .equals(AdResponse.Status.ok)) {
-            cardLayout.removeAllViews();
             cardLayout.addView(adResponse.getView());
             adLoading.setVisibility(View.GONE);
           } else {
             cardLayout.setVisibility(View.GONE);
+            NativeAdErrorEvent nativeAdErrorEvent =
+                new NativeAdErrorEvent(post, CardTouchEvent.Type.ERROR, position);
+            cardTouchEventPublishSubject.onNext(nativeAdErrorEvent);
           }
         }, throwable -> {
           cardLayout.setVisibility(View.GONE);
+          NativeAdErrorEvent nativeAdErrorEvent =
+              new NativeAdErrorEvent(post, CardTouchEvent.Type.ERROR, position);
           cardTouchEventPublishSubject.onNext(nativeAdErrorEvent);
           Logger.e(this, throwable);
         });

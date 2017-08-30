@@ -6,7 +6,7 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import cm.aptoide.pt.V8Engine;
+import cm.aptoide.pt.preferences.Application;
 import cm.aptoide.pt.store.StoreTheme;
 import cm.aptoide.pt.view.ThemeUtils;
 import cm.aptoide.pt.view.permission.PermissionServiceFragment;
@@ -51,7 +51,7 @@ public abstract class UIComponentFragment extends PermissionServiceFragment impl
   @CallSuper @Nullable @Override
   public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
       @Nullable Bundle savedInstanceState) {
-    String storeTheme = V8Engine.getConfiguration().getDefaultTheme();
+    String storeTheme = Application.getConfiguration().getDefaultTheme();
     if (storeTheme != null) {
       ThemeUtils.setStoreTheme(getActivity(), storeTheme);
       ThemeUtils.setStatusBarThemeColor(getActivity(), StoreTheme.get(storeTheme));

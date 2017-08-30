@@ -30,6 +30,7 @@ import cm.aptoide.pt.dataprovider.model.v7.Event;
 import cm.aptoide.pt.dataprovider.ws.v7.store.StoreContext;
 import cm.aptoide.pt.install.InstalledRepository;
 import cm.aptoide.pt.networking.image.ImageLoader;
+import cm.aptoide.pt.preferences.Application;
 import cm.aptoide.pt.repository.RepositoryFactory;
 import cm.aptoide.pt.spotandshare.view.SpotSharePreviewActivity;
 import cm.aptoide.pt.store.StoreTheme;
@@ -123,7 +124,7 @@ public class HomeFragment extends StoreFragment {
     userAvatarImage = (ImageView) baseHeaderView.findViewById(R.id.profile_image);
 
     baseHeaderView.setBackgroundColor(ContextCompat.getColor(getContext(),
-        StoreTheme.get(V8Engine.getConfiguration().getDefaultTheme()).getPrimaryColor()));
+        StoreTheme.get(Application.getConfiguration().getDefaultTheme()).getPrimaryColor()));
 
     accountManager.accountStatus()
         .observeOn(AndroidSchedulers.mainThread())

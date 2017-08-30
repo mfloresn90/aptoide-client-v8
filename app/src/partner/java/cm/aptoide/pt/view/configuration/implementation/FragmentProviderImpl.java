@@ -1,7 +1,6 @@
 package cm.aptoide.pt.view.configuration.implementation;
 
 import android.support.v4.app.Fragment;
-import cm.aptoide.pt.V8Engine;
 import cm.aptoide.pt.VanillaConfiguration;
 import cm.aptoide.pt.addressbook.data.Contact;
 import cm.aptoide.pt.database.realm.MinimalAd;
@@ -68,38 +67,38 @@ public class FragmentProviderImpl implements FragmentProvider {
   }
 
   @Override public Fragment newStoreFragment(String storeName, String storeTheme) {
-    return StoreFragment.newInstance(storeName, V8Engine.getConfiguration().getDefaultTheme());
+    return StoreFragment.newInstance(storeName, Application.getConfiguration().getDefaultTheme());
   }
 
   @Override public Fragment newStoreFragment(String storeName, String storeTheme,
       StoreFragment.OpenType openType) {
-    return StoreFragment.newInstance(storeName, V8Engine.getConfiguration().getDefaultTheme(),
+    return StoreFragment.newInstance(storeName, Application.getConfiguration().getDefaultTheme(),
         openType);
   }
 
   @Override
   public Fragment newStoreFragment(String storeName, String storeTheme, Event.Name defaultTab,
       StoreFragment.OpenType openType) {
-    return StoreFragment.newInstance(storeName, V8Engine.getConfiguration().getDefaultTheme(),
+    return StoreFragment.newInstance(storeName, Application.getConfiguration().getDefaultTheme(),
         defaultTab, openType);
   }
 
   @Override public Fragment newStoreFragment(long userId, String storeTheme, Event.Name defaultTab,
       StoreFragment.OpenType openType) {
-    return StoreFragment.newInstance(userId, V8Engine.getConfiguration().getDefaultTheme(),
+    return StoreFragment.newInstance(userId, Application.getConfiguration().getDefaultTheme(),
         defaultTab, openType);
   }
 
   @Override public Fragment newStoreFragment(long userId, String storeTheme,
       StoreFragment.OpenType openType) {
-    return StoreFragment.newInstance(userId, V8Engine.getConfiguration().getDefaultTheme(),
+    return StoreFragment.newInstance(userId, Application.getConfiguration().getDefaultTheme(),
         openType);
   }
 
   @Override
   public Fragment newHomeFragment(String storeName, StoreContext storeContext, String storeTheme) {
     return HomeFragment.newInstance(storeName, storeContext,
-        V8Engine.getConfiguration().getDefaultTheme());
+        Application.getConfiguration().getDefaultTheme());
   }
 
   @Override public Fragment newSearchFragment(String query) {
@@ -111,7 +110,7 @@ public class FragmentProviderImpl implements FragmentProvider {
         .isSearch()) {
       return SearchFragment.newInstance(query);
     } else {
-      return SearchFragment.newInstance(query, V8Engine.getConfiguration().getDefaultStore());
+      return SearchFragment.newInstance(query, Application.getConfiguration().getDefaultStore());
     }
   }
 
@@ -125,7 +124,7 @@ public class FragmentProviderImpl implements FragmentProvider {
       return SearchFragment.newInstance(query, onlyTrustedApps);
     } else {
       return SearchFragment.newInstance(query, onlyTrustedApps,
-          V8Engine.getConfiguration().getDefaultStore());
+          Application.getConfiguration().getDefaultStore());
     }
   }
 
@@ -149,18 +148,18 @@ public class FragmentProviderImpl implements FragmentProvider {
 
   @Override public Fragment newAppViewFragment(long appId, String packageName) {
     return AppViewFragment.newInstance(appId, packageName,
-        V8Engine.getConfiguration().getDefaultTheme(),
-        V8Engine.getConfiguration().getDefaultStore());
+        Application.getConfiguration().getDefaultTheme(),
+        Application.getConfiguration().getDefaultStore());
   }
 
   @Override public Fragment newAppViewFragment(long appId, String packageName, String storeTheme,
       String storeName) {
     return AppViewFragment.newInstance(appId, packageName,
-        V8Engine.getConfiguration().getDefaultTheme(), storeName);
+        Application.getConfiguration().getDefaultTheme(), storeName);
   }
 
   @Override public Fragment newAppViewFragment(MinimalAd minimalAd) {
-    return AppViewFragment.newInstance(minimalAd, V8Engine.getConfiguration().getDefaultTheme());
+    return AppViewFragment.newInstance(minimalAd, Application.getConfiguration().getDefaultTheme());
   }
 
   @Override
@@ -184,14 +183,14 @@ public class FragmentProviderImpl implements FragmentProvider {
   public Fragment newStoreTabGridRecyclerFragment(Event event, String storeTheme, String tag,
       StoreContext storeContext) {
     return StoreTabGridRecyclerFragment.newInstance(event,
-        V8Engine.getConfiguration().getDefaultTheme(), tag, storeContext);
+        Application.getConfiguration().getDefaultTheme(), tag, storeContext);
   }
 
   @Override
   public Fragment newStoreTabGridRecyclerFragment(Event event, String title, String storeTheme,
       String tag, StoreContext storeContext) {
     return StoreTabGridRecyclerFragment.newInstance(event, title,
-        V8Engine.getConfiguration().getDefaultTheme(), tag, storeContext);
+        Application.getConfiguration().getDefaultTheme(), tag, storeContext);
   }
 
   @Override public Fragment newListAppsFragment() {
@@ -233,7 +232,7 @@ public class FragmentProviderImpl implements FragmentProvider {
 
   @Override
   public Fragment newSubscribedStoresFragment(Event event, String storeTheme, String tag) {
-    return MyStoresFragment.newInstance(event, V8Engine.getConfiguration().getDefaultTheme(), tag);
+    return MyStoresFragment.newInstance(event, Application.getConfiguration().getDefaultTheme(), tag);
   }
 
   @Override public Fragment newSearchPagerTabFragment(String query, boolean subscribedStores,
@@ -260,7 +259,7 @@ public class FragmentProviderImpl implements FragmentProvider {
       return OtherVersionsFragment.newInstance(appName, appImgUrl, appPackage);
     } else {
       return OtherVersionsFragment.newInstance(appName, appImgUrl, appPackage,
-          V8Engine.getConfiguration().getDefaultStore());
+          Application.getConfiguration().getDefaultStore());
     }
   }
 
@@ -290,7 +289,7 @@ public class FragmentProviderImpl implements FragmentProvider {
   @Override public Fragment newRateAndReviewsFragment(long appId, String appName, String storeName,
       String packageName, String storeTheme) {
     return RateAndReviewsFragment.newInstance(appId, appName, storeName, packageName,
-        V8Engine.getConfiguration().getDefaultTheme());
+        Application.getConfiguration().getDefaultTheme());
   }
 
   @Override public Fragment newRateAndReviewsFragment(long appId, String appName, String storeName,
@@ -301,7 +300,7 @@ public class FragmentProviderImpl implements FragmentProvider {
   @Override
   public Fragment newDescriptionFragment(String appName, String description, String storeTheme) {
     return DescriptionFragment.newInstance(appName, description,
-        V8Engine.getConfiguration().getDefaultTheme());
+        Application.getConfiguration().getDefaultTheme());
   }
 
   @Override public Fragment newSocialFragment(String socialUrl, String pageTitle) {
@@ -315,32 +314,32 @@ public class FragmentProviderImpl implements FragmentProvider {
   @Override public Fragment newTimeLineFollowersUsingUserIdFragment(Long userId, String storeTheme,
       String title) {
     return TimeLineFollowersFragment.newInstanceUsingUser(userId,
-        V8Engine.getConfiguration().getDefaultTheme(), title);
+        Application.getConfiguration().getDefaultTheme(), title);
   }
 
   @Override public Fragment newTimeLineFollowingFragmentUsingUserId(Long id, String storeTheme,
       String title) {
     return TimeLineFollowingFragment.newInstanceUsingUserId(id,
-        V8Engine.getConfiguration().getDefaultTheme(), title);
+        Application.getConfiguration().getDefaultTheme(), title);
   }
 
   @Override
   public Fragment newTimeLineFollowersUsingStoreIdFragment(Long storeId, String storeTheme,
       String title) {
     return TimeLineFollowersFragment.newInstanceUsingStore(storeId,
-        V8Engine.getConfiguration().getDefaultTheme(), title);
+        Application.getConfiguration().getDefaultTheme(), title);
   }
 
   @Override public Fragment newTimeLineFollowingFragmentUsingStoreId(Long id, String storeTheme,
       String title) {
     return TimeLineFollowingFragment.newInstanceUsingStoreId(id,
-        V8Engine.getConfiguration().getDefaultTheme(), title);
+        Application.getConfiguration().getDefaultTheme(), title);
   }
 
   @Override
   public Fragment newTimeLineLikesFragment(String cardUid, long numberOfLikes, String storeTheme,
       String title) {
-    return TimeLineLikesFragment.newInstance(V8Engine.getConfiguration().getDefaultTheme(), cardUid,
+    return TimeLineLikesFragment.newInstance(Application.getConfiguration().getDefaultTheme(), cardUid,
         numberOfLikes, title);
   }
 
@@ -387,7 +386,7 @@ public class FragmentProviderImpl implements FragmentProvider {
 
   @Override public Fragment newTimeLineFollowersFragment(String storeTheme, String title) {
     return TimeLineFollowersFragment.newInstanceUsingUser(
-        V8Engine.getConfiguration().getDefaultTheme(), title);
+        Application.getConfiguration().getDefaultTheme(), title);
   }
 
   @Override public Fragment newRecommendedStoresFragment() {

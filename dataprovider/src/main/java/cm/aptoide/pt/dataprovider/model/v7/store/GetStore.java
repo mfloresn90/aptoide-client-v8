@@ -5,21 +5,32 @@
 
 package cm.aptoide.pt.dataprovider.model.v7.store;
 
-import cm.aptoide.pt.dataprovider.model.v7.BaseV7Response;
-import cm.aptoide.pt.dataprovider.model.v7.GetStoreWidgets;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+public class GetStore extends StoreUserAbstraction<GetStoreMeta> {
 
-/**
- * TODO
- */
-@Data @EqualsAndHashCode(callSuper = true) public class GetStore extends BaseV7Response {
+  public GetStore() {
+  }
 
-  private Nodes nodes;
+  public int hashCode() {
+    final int PRIME = 59;
+    int result = 1;
+    result = result * PRIME + super.hashCode();
+    return result;
+  }
 
-  @Data public static class Nodes {
-    private GetStoreMeta meta;
-    private GetStoreTabs tabs;
-    private GetStoreWidgets widgets;
+  protected boolean canEqual(Object other) {
+    return other instanceof GetStore;
+  }
+
+  public boolean equals(Object o) {
+    if (o == this) return true;
+    if (!(o instanceof GetStore)) return false;
+    final GetStore other = (GetStore) o;
+    if (!other.canEqual((Object) this)) return false;
+    if (!super.equals(o)) return false;
+    return true;
+  }
+
+  public String toString() {
+    return "GetStore()";
   }
 }

@@ -1,21 +1,34 @@
 package cm.aptoide.pt.dataprovider.model.v7.store;
 
-import cm.aptoide.pt.dataprovider.model.v7.BaseV7Response;
-import cm.aptoide.pt.dataprovider.model.v7.GetStoreWidgets;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 /**
  * Created by trinkes on 23/02/2017.
  */
-@Data @EqualsAndHashCode(callSuper = true) public class GetHome extends BaseV7Response {
+public class GetHome extends StoreUserAbstraction<GetHomeMeta> {
 
-  private Nodes nodes;
+  public GetHome() {
+  }
 
-  @Data public static class Nodes {
+  public int hashCode() {
+    final int PRIME = 59;
+    int result = 1;
+    result = result * PRIME + super.hashCode();
+    return result;
+  }
 
-    private GetHomeMeta meta;
-    private GetStoreTabs tabs;
-    private GetStoreWidgets widgets;
+  protected boolean canEqual(Object other) {
+    return other instanceof GetHome;
+  }
+
+  public boolean equals(Object o) {
+    if (o == this) return true;
+    if (!(o instanceof GetHome)) return false;
+    final GetHome other = (GetHome) o;
+    if (!other.canEqual((Object) this)) return false;
+    if (!super.equals(o)) return false;
+    return true;
+  }
+
+  public String toString() {
+    return "GetHome()";
   }
 }

@@ -3,15 +3,14 @@ package cm.aptoide.pt.database.accessors;
 import cm.aptoide.pt.database.realm.Store;
 import java.util.List;
 import rx.Observable;
-import rx.Scheduler;
 
 /**
  * Created by trinkes on 9/2/16.
  */
 public class StoreAccessor extends SimpleAccessor<Store> {
 
-  public StoreAccessor(Database db, Scheduler observingScheduler) {
-    super(db, observingScheduler, Store.class);
+  public StoreAccessor(Database db) {
+    super(db, Store.class);
   }
 
   public Observable<List<Store>> getAll() {
@@ -40,5 +39,9 @@ public class StoreAccessor extends SimpleAccessor<Store> {
 
   public Observable<List<Store>> getAsList(long storeId) {
     return database.getAsList(Store.class, Store.STORE_ID, storeId);
+  }
+
+  public Observable<List<Store>> getAsList(String storeName) {
+    return database.getAsList(Store.class, Store.STORE_NAME, storeName);
   }
 }

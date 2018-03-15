@@ -14,9 +14,7 @@ import java.util.List;
  * Created by neuro on 27-04-2016.
  */
 public class Store {
-
   public static final String PUBLIC_ACCESS = "PUBLIC";
-
   private long id;
   private String name;
   private String avatar;
@@ -27,6 +25,24 @@ public class Store {
   @JsonProperty("links") private List<SocialChannel> socialChannels;
   private String status;
   private String access;
+  private Urls urls;
+  private Badge badge;
+
+  public Badge getBadge() {
+    return badge;
+  }
+
+  public void setBadge(Badge badge) {
+    this.badge = badge;
+  }
+
+  public Urls getUrls() {
+    return urls;
+  }
+
+  public void setUrls(Urls urls) {
+    this.urls = urls;
+  }
 
   public long getId() {
     return id;
@@ -109,7 +125,11 @@ public class Store {
   }
 
   public enum SocialChannelType {
-    FACEBOOK, TWITTER, YOUTUBE, TWITCH
+    FACEBOOK, TWITTER, YOUTUBE, TWITCH, BLOG
+  }
+
+  public enum BadgeType {
+    NONE, BRONZE, SILVER, GOLD, PLATINUM
   }
 
   public static class Stats {
@@ -207,6 +227,63 @@ public class Store {
 
     public void setUrl(String url) {
       this.url = url;
+    }
+  }
+
+  public static class Urls {
+
+    private String mobile;
+
+    public Urls() {
+    }
+
+    public String getMobile() {
+      return this.mobile;
+    }
+
+    public void setMobile(String mobile) {
+      this.mobile = mobile;
+    }
+
+    public int hashCode() {
+      final int PRIME = 59;
+      int result = 1;
+      final Object $mobile = this.getMobile();
+      result = result * PRIME + ($mobile == null ? 43 : $mobile.hashCode());
+      return result;
+    }
+
+    public boolean equals(Object o) {
+      if (o == this) return true;
+      if (!(o instanceof Urls)) return false;
+      final Urls other = (Urls) o;
+      if (!other.canEqual((Object) this)) return false;
+      final Object this$mobile = this.getMobile();
+      final Object other$mobile = other.getMobile();
+      if (this$mobile == null ? other$mobile != null : !this$mobile.equals(other$mobile)) {
+        return false;
+      }
+      return true;
+    }
+
+    public String toString() {
+      return "Store.Urls(mobile=" + this.getMobile() + ")";
+    }
+
+    protected boolean canEqual(Object other) {
+      return other instanceof Urls;
+    }
+  }
+
+  public static class Badge {
+    BadgeType name;
+
+    public BadgeType getName() {
+      return name;
+    }
+
+    public void setName(BadgeType name) {
+      this.name = name;
     }
   }
 }

@@ -8,13 +8,13 @@ package cm.aptoide.pt.downloadmanager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import cm.aptoide.pt.crashreports.CrashReport;
 import cm.aptoide.pt.database.accessors.DownloadAccessor;
 import cm.aptoide.pt.database.realm.Download;
 import cm.aptoide.pt.database.realm.FileToDownload;
 import cm.aptoide.pt.logger.Logger;
 import cm.aptoide.pt.utils.AptoideUtils;
 import cm.aptoide.pt.utils.FileUtils;
-import cm.aptoide.pt.v8engine.crashreports.CrashReport;
 import com.liulishuo.filedownloader.BaseDownloadTask;
 import com.liulishuo.filedownloader.FileDownloadLargeFileListener;
 import com.liulishuo.filedownloader.FileDownloader;
@@ -23,10 +23,9 @@ import com.liulishuo.filedownloader.exception.FileDownloadOutOfSpaceException;
 import io.realm.RealmList;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
-import lombok.Setter;
 import rx.Observable;
-import rx.Scheduler;
 import rx.observables.ConnectableObservable;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by trinkes on 5/13/16.
@@ -48,18 +47,17 @@ class DownloadTask extends FileDownloadLargeFileListener {
    * default value is
    * true
    */
-  @Setter boolean isSerial = true;
+  boolean isSerial = true;
   private ConnectableObservable<Download> observable;
   private Analytics analytics;
   private String apkPath;
   private String obbPath;
   private String genericPath;
   private FileDownloader fileDownloader;
-  private final Scheduler ioScheduler;
 
   DownloadTask(DownloadAccessor downloadAccessor, Download download, FileUtils fileUtils,
       Analytics analytics, AptoideDownloadManager downloadManager, String apkPath, String obbPath,
-      String genericPath, FileDownloader fileDownloader, Scheduler ioScheduler) {
+      String genericPath, FileDownloader fileDownloader) {
     this.analytics = analytics;
     this.download = download;
     this.md5 = download.getMd5();
@@ -70,9 +68,8 @@ class DownloadTask extends FileDownloadLargeFileListener {
     this.obbPath = obbPath;
     this.genericPath = genericPath;
     this.fileDownloader = fileDownloader;
-    this.ioScheduler = ioScheduler;
     this.observable = Observable.interval(INTERVAL / 4, INTERVAL, TimeUnit.MILLISECONDS)
-        .subscribeOn(ioScheduler)
+        .subscribeOn(Schedulers.io())
         .takeUntil(integer1 -> download.getOverallDownloadStatus() != Download.PROGRESS
             && download.getOverallDownloadStatus() != Download.IN_QUEUE
             && download.getOverallDownloadStatus() != Download.PENDING)
@@ -85,6 +82,7 @@ class DownloadTask extends FileDownloadLargeFileListener {
             if (updatedDownload.getOverallProgress() == AptoideDownloadManager.PROGRESS_MAX_VALUE
                 && download.getOverallDownloadStatus() != Download.COMPLETED) {
               setDownloadStatus(Download.COMPLETED, download);
+              analytics.onDownloadComplete(download);
               downloadManager.currentDownloadFinished();
             }
             return true;
@@ -126,7 +124,7 @@ class DownloadTask extends FileDownloadLargeFileListener {
       downloadAccessor.save(download);
       return null;
     })
-        .subscribeOn(ioScheduler)
+        .subscribeOn(Schedulers.io())
         .subscribe(__ -> {
         }, err -> CrashReport.getInstance()
             .log(err));
@@ -219,7 +217,7 @@ class DownloadTask extends FileDownloadLargeFileListener {
           });
         })
         .doOnUnsubscribe(() -> downloadManager.setDownloading(false))
-        .subscribeOn(ioScheduler)
+        .subscribeOn(Schedulers.io())
         .subscribe(success -> saveDownloadInDb(download),
             throwable -> setDownloadStatus(Download.ERROR, download));
     download.setDownloadSpeed(task.getSpeed() * 1024);
@@ -376,5 +374,9 @@ class DownloadTask extends FileDownloadLargeFileListener {
         break;
     }
     return path;
+  }
+
+  public void setSerial(boolean isSerial) {
+    this.isSerial = isSerial;
   }
 }

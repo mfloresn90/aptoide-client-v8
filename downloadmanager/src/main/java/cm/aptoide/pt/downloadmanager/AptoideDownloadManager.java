@@ -1,18 +1,17 @@
 package cm.aptoide.pt.downloadmanager;
 
 import android.support.annotation.NonNull;
+import cm.aptoide.pt.crashreports.CrashReport;
 import cm.aptoide.pt.database.accessors.DownloadAccessor;
 import cm.aptoide.pt.database.realm.Download;
 import cm.aptoide.pt.database.realm.FileToDownload;
 import cm.aptoide.pt.logger.Logger;
 import cm.aptoide.pt.utils.AptoideUtils;
 import cm.aptoide.pt.utils.FileUtils;
-import cm.aptoide.pt.v8engine.crashreports.CrashReport;
 import com.liulishuo.filedownloader.FileDownloader;
 import java.util.List;
 import rx.Completable;
 import rx.Observable;
-import rx.Scheduler;
 import rx.schedulers.Schedulers;
 
 /**
@@ -28,7 +27,6 @@ public class AptoideDownloadManager {
   private final String downloadsStoragePath;
   private final String apkPath;
   private final String obbPath;
-  private final Scheduler scheduler;
   private boolean isDownloading = false;
   private boolean isPausing = false;
   private DownloadAccessor downloadAccessor;
@@ -39,7 +37,7 @@ public class AptoideDownloadManager {
 
   public AptoideDownloadManager(DownloadAccessor downloadAccessor, CacheManager cacheHelper,
       FileUtils fileUtils, Analytics analytics, FileDownloader fileDownloader,
-      String downloadsStoragePath, String apkPath, String obbPath, Scheduler scheduler) {
+      String downloadsStoragePath, String apkPath, String obbPath) {
     this.fileDownloader = fileDownloader;
     this.analytics = analytics;
     this.cacheHelper = cacheHelper;
@@ -48,7 +46,6 @@ public class AptoideDownloadManager {
     this.apkPath = apkPath;
     this.obbPath = obbPath;
     this.downloadAccessor = downloadAccessor;
-    this.scheduler = scheduler;
   }
 
   /**
@@ -205,7 +202,7 @@ public class AptoideDownloadManager {
           .subscribe(download -> {
             if (download != null) {
               new DownloadTask(downloadAccessor, download, fileUtils, analytics, this, apkPath,
-                  obbPath, downloadsStoragePath, fileDownloader, scheduler).startDownload();
+                  obbPath, downloadsStoragePath, fileDownloader).startDownload();
               Logger.d(TAG, "Download with md5 " + download.getMd5() + " started");
             } else {
               isDownloading = false;

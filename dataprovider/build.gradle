@@ -2,7 +2,6 @@ apply plugin: 'com.android.library'
 apply plugin: 'me.tatarka.retrolambda'
 retrolambda {
   jvmArgs '-noverify'
-  //defaultMethods true
 }
 
 android {
@@ -33,6 +32,8 @@ android {
           "\"" + project.APTOIDE_WEB_SERVICES_DEVELOPMENT_WRITE_V7_HOST + "\""
       buildConfigField "String", "APTOIDE_WEB_SERVICES_NOTIFICATION_HOST",
           "\"" + project.APTOIDE_WEB_SERVICES_NOTIFICATION_HOST + "\""
+      buildConfigField "String", "APTOIDE_WEB_SERVICES_READ_V7_HOST",
+          "\"" + project.APTOIDE_WEB_SERVICES_DEVELOPMENT_READ_V7_HOST + "\""
     }
     prod {
       buildConfigField "String", "APTOIDE_WEB_SERVICES_SCHEME",
@@ -47,6 +48,8 @@ android {
           "\"" + project.APTOIDE_WEB_SERVICES_PRODUCTION_WRITE_V7_HOST + "\""
       buildConfigField "String", "APTOIDE_WEB_SERVICES_NOTIFICATION_HOST",
           "\"" + project.APTOIDE_WEB_SERVICES_NOTIFICATION_HOST + "\""
+      buildConfigField "String", "APTOIDE_WEB_SERVICES_READ_V7_HOST",
+          "\"" + project.APTOIDE_WEB_SERVICES_PRODUCTION_READ_V7_HOST + "\""
     }
   }
 
@@ -61,9 +64,6 @@ android {
     sourceCompatibility JavaVersion.VERSION_1_8
     targetCompatibility JavaVersion.VERSION_1_8
   }
-
-  // Websockets
-  useLibrary 'org.apache.http.legacy'
 
   packagingOptions {
     exclude 'META-INF/services/javax.annotation.processing.Processor'
@@ -102,10 +102,6 @@ dependencies {
   // from remote repos
   //
 
-  provided "org.projectlombok:lombok:${LOMBOK_VERSION}"
-  // Just for lombok not to complain
-  provided "org.glassfish:javax.annotation:${JAVAX_ANNOTATIONS_VERSION}"
-
   testCompile "com.squareup.okhttp3:mockwebserver:${MOCK_WEB_SERVER_VERSION}"
   testCompile "junit:junit:${JUNIT_VERSION}"
   testCompile "org.mockito:mockito-core:${MOCKITO_CORE_VERSION}"
@@ -126,4 +122,8 @@ dependencies {
   compile "com.fasterxml.jackson.core:jackson-databind:${JACKSON_VERSION}"
 
   compile 'com.squareup.okhttp3:logging-interceptor:3.4.1'
+
+  // Parceler - https://github.com/johncarl81/parceler
+  provided "org.parceler:parceler-api:${PARCELER_VERSION}"
+  annotationProcessor "org.parceler:parceler:${PARCELER_VERSION}"
 }
